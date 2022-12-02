@@ -14,14 +14,6 @@ library(purrr)
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
-### Problem 0 
-
-First, create a subdirectory to store the local data files used in the assignment.
-
-```{r}
-dir.create(file.path(getwd(), "hw6_data_file"), recursive = TRUE)
-```
-
 ### Problem 2
 
 First, import the dataset from the GitHub repository.
@@ -103,7 +95,15 @@ city_gle %>%
         plot.title = element_text(size = 12))
 ```
 
+Homicides in which the victim is male are more like to be resolved than those in which the victim is female in `r city_gle %>% filter(term == "victim_sexMale") %>% filter(OR>1) %>% pull(city_state)`.
 
+### Problem 3 
+
+First, import the dataset.
+
+```{r, message=FALSE}
+birthweight = read_csv("data/birthweight.csv")
+```
 
 
 
