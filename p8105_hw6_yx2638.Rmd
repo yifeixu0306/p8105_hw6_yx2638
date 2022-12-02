@@ -1,0 +1,16 @@
+---
+title: "Homework 6"
+author: "Yifei Xu"
+date: "2022-12-02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Problem 0 Create a subdirectory
+```{r}
+dir.create(file.path(getwd(), "hw6_data_file"), recursive = TRUE)
+```
+
