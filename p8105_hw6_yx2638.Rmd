@@ -9,6 +9,7 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(purrr)
 ```
 
 ### Problem 0 
@@ -68,5 +69,21 @@ fit_logistic %>%
 
 Homicides in which the victim is male are significantly less like to be resolved than those in which the victim is female.
 
+Fourth, run glm for each of the cities.
+
+```{r}
+city_gle = 
+  homicide_tidy %>% 
+  nest(data = -city_state) %>% 
+  mutate(models = map(.x = data, ~glm(resolved ~ victim_age + victim_sex + victim_race, data = .x, family = binomial())),
+         results = map(models, broom::tidy)) %>% 
+  select(city_state, results) %>% 
+  unnest(results) %>% 
+  mutate(OR = exp(estimate),
+         conf_low = exp(estimate - 1.96 * std.error),
+         conf_high = exp(estimate + 1.96 * std.error)) %>% 
+  select(city_state, term, OR, conf_low, conf_high) 
+
+```
 
 
