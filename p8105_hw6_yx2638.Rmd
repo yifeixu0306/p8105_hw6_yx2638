@@ -32,10 +32,21 @@ homicide = read_csv(url(data_url))
 Second, clean the dataset as required.
 
 ```{r, message=FALSE}
-
+homicide_tidy = homicide %>%
+  janitor::clean_names() %>%
+  mutate(reported_date = as.Date(as.character(reported_date), format = "%Y%m%d")) %>% 
+  mutate(city_state = str_c(city, state, sep = ", "), 
+         resolved= case_when(disposition == "Closed by arrest" ~ "solved",
+                                disposition == "Closed without arrest" ~ "unsolved",
+                                disposition == "Open/No arrest" ~ "unsolved")) %>% 
+  select(city_state, everything()) %>%
+  filter(!city_state %in% c("Tulsa, AL", "Dallas, TX", "Phoenix, AZ", "Kansas City, MO")) %>%
+  filter(victim_race %in% c("White", "Black")) %>%
+  mutate(victim_age = as.numeric(victim_age))
 
 ```
 
+Third, fit a logistic regression.
 
 
 
