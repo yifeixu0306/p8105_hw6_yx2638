@@ -7,10 +7,36 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
-### Problem 0 Create a subdirectory
+### Problem 0 
+
+First, create a subdirectory to store the local data files used in the assignment.
+
 ```{r}
 dir.create(file.path(getwd(), "hw6_data_file"), recursive = TRUE)
 ```
+
+### Problem 2
+
+First, import the dataset from the GitHub repository.
+
+```{r, message=FALSE}
+data_url = "https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv"
+
+homicide = read_csv(url(data_url)) 
+```
+
+Second, clean the dataset as required.
+
+```{r, message=FALSE}
+
+
+```
+
+
+
+
 
