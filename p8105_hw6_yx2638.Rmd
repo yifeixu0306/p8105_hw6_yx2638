@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(purrr)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 ### Problem 0 
@@ -83,7 +85,29 @@ city_gle =
          conf_low = exp(estimate - 1.96 * std.error),
          conf_high = exp(estimate + 1.96 * std.error)) %>% 
   select(city_state, term, OR, conf_low, conf_high) 
-
 ```
+
+Finally, create a plot that shows the estimated ORs and CIs for each city.
+
+```{r}
+city_gle %>% 
+  filter(term == "victim_sexMale") %>% 
+  mutate(city_state = fct_reorder(city_state, OR)) %>% 
+  ggplot(aes(x = city_state, y = OR)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high)) + 
+  labs(x = "City", 
+       y = "Estimated Odds Ratio",
+       title = "Estimated Odds Ratio and Confidence Intervals for Solving Homicides") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1),
+        plot.title = element_text(size = 12))
+```
+
+
+
+
+
+
+
 
 
