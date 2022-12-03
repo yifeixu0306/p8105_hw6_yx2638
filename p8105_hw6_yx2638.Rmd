@@ -173,8 +173,26 @@ mult_fit_1 = lm(bwt ~  babysex + bhead + blength + delwt + fincome + gaweeks + m
 summary(mult_fit_1)
 ```
 
+Second, I would like to explore the interactions among these selected continuous variables.
 
+```{r, message=FALSE, warning=FALSE}
+fit_var = birthweight_tidy %>%
+  select(bhead, blength, delwt, fincome, gaweeks, mheight, parity, ppwt, smoken)
 
+PerformanceAnalytics::chart.Correlation(fit_var, method = "pearson")
+```
+
+From the plot above, we can observe that the a potential interaction might exsit between `delwt` and `ppwt` (r=0.87), as well as `bhead` and `blength` (r=0.64). Therefore, I plan to add these two interaction items in my model.
+
+```{r}
+mult_fit_2 = lm(bwt ~  babysex + bhead + blength + delwt + fincome + gaweeks + mheight + mrace + parity + ppwt + smoken +
+                  delwt*ppwt + bhead*blength,
+              data=birthweight_tidy)
+
+summary(mult_fit_2)
+```
+
+Next, I will show a plot of model residuals against fitted values.
 
 
 
