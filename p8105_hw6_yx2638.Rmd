@@ -19,7 +19,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 First, import the dataset from the GitHub repository.
 
-```{r, message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 data_url = "https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv"
 
 homicide = read_csv(url(data_url)) 
@@ -160,12 +160,12 @@ sum(is.na(birthweight_tidy))
 
 First, I use stepwise method to select variables.
 
-```{r}
+```{r, message=FALSE}
 mult_fit = lm(bwt ~ ., data=birthweight_tidy)
 step(mult_fit, direction="both")
 ```
 
-After stepwise selection, I get babysex, bhead, blength, delwt, fincome, gaweeks, mheight, mrace, parity, ppwt and smoken left in the model.
+After stepwise selection, I get `babysex`, `bhead`, `blength`, `delwt`, `fincome`, `gaweeks`, `mheight`, `mrace`, `parity`, `ppwt` and `smoken` left in the model.
 
 ```{r}
 mult_fit_1 = lm(bwt ~  babysex + bhead + blength + delwt + fincome + gaweeks + mheight + mrace + parity + ppwt + smoken,
@@ -187,7 +187,7 @@ cor(fit_var)
 pairs(fit_var)
 ```
 
-From the plot above, we can observe that the a potential collinearity might exsit between `delwt` and `ppwt`, as well as `bhead` and `blength`. Therefore, I plan to drop `ppwt` and `blength`, whose p-values are relatively larger in my model.
+From the plot above, we can observe that the a potential collinearity might exsit between `delwt` and `ppwt`, as well as `bhead` and `blength`. Therefore, I plan to drop `ppwt` and `blength` whose p-values are relatively larger in my model.
 
 ```{r}
 # my model
@@ -210,10 +210,11 @@ birthweight_tidy %>%
        x = "Fitted Values", y = "Residuals") 
 ```
 
+From the plot of residuals against fitted values above, we can observe a cluster around 0, and some extreme values when prediction is below 1000. The constant variance assumption is generally satisfied.
 
 ### Model Comparision
 
-```{r}
+```{r,message=FALSE, warning=FALSE}
 # use length at birth and gestational age as predictors
 fit_com_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy)
 
