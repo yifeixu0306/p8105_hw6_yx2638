@@ -174,20 +174,24 @@ mult_fit_1 = lm(bwt ~  babysex + bhead + blength + delwt + fincome + gaweeks + m
 summary(mult_fit_1)
 ```
 
-Second, I would like to explore the interactions among these selected continuous variables.
+Second, I would like to explore the collinearity among these selected continuous variables.
 
 ```{r, message=FALSE, warning=FALSE}
 fit_var = birthweight_tidy %>%
   select(bhead, blength, delwt, fincome, gaweeks, mheight, parity, ppwt, smoken)
 
-PerformanceAnalytics::chart.Correlation(fit_var, method = "pearson")
+# Correlation matrix for all selected continuous variables
+cor(fit_var)
+
+# Scatter plot matrix for all selected continuous variables
+pairs(fit_var)
 ```
 
-From the plot above, we can observe that the a potential interaction might exsit between `delwt` and `ppwt` (r=0.87), as well as `bhead` and `blength` (r=0.64). Therefore, I plan to add these two interaction items in my model.
+From the plot above, we can observe that the a potential collinearity might exsit between `delwt` and `ppwt`, as well as `bhead` and `blength`. Therefore, I plan to drop `ppwt` and `blength`, whose p-values are relatively larger in my model.
 
 ```{r}
-mult_fit_2 = lm(bwt ~  babysex + bhead + blength + delwt + fincome + gaweeks + mheight + mrace + parity + ppwt + smoken +
-                  delwt*ppwt + bhead*blength,
+# my model
+mult_fit_2 = lm(bwt ~  babysex + bhead + delwt + fincome + gaweeks + mheight + mrace + parity + smoken,
               data=birthweight_tidy)
 
 summary(mult_fit_2)
@@ -203,13 +207,54 @@ birthweight_tidy %>%
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Plot of the Model Residuals Against Fitted Values",
-       x = "Fitted Values", y = "Residuals") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+       x = "Fitted Values", y = "Residuals") 
 ```
 
 
+### Model Comparision
 
+```{r}
+# use length at birth and gestational age as predictors
+fit_com_1 = lm(bwt ~ blength + gaweeks, data = birthweight_tidy)
 
+# use head circumference, length, sex, and all interactions
+fit_com_2 = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex + blength*babysex + bhead*blength*babysex,
+               data = birthweight_tidy)
+
+# cross-validation 
+cv_df = 
+  crossv_mc(birthweight_tidy, 100) %>% 
+    mutate(
+        train = map(train, as.tibble),
+        test = map(test,as.tibble)
+    )  %>%
+  mutate(
+    model_fit1  = map(train, ~lm(bwt ~ babysex + bhead + delwt + fincome + gaweeks + mheight + mrace + parity + smoken,
+                                 data = birthweight_tidy)),
+    model_fit2  = map(train, ~lm(bwt ~ blength + gaweeks, data = birthweight_tidy)),
+    model_fit3  = map(train, ~lm(bwt ~ blength + bhead + babysex + blength*bhead + blength* babysex + bhead*babysex + blength*bhead*babysex, data = birthweight_tidy))) %>% 
+  mutate(
+    rmse_1 = map2_dbl(model_fit1, test, ~rmse(model = .x, data = .y)),
+    rmse_2 = map2_dbl(model_fit2 , test, ~rmse(model = .x, data = .y)),
+    rmse_3 = map2_dbl(model_fit3, test, ~rmse(model = .x, data = .y))) 
+
+cv_df %>% 
+  select(starts_with("rmse")) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  mutate(model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + 
+  geom_violin() +
+  labs(title = "Comparison of the Cross-Validated Prediction Error", 
+       x = "Models", 
+       y = "Root Mean Square Error (RMSE)")  +
+  scale_x_discrete(labels = c("My Model", "Test Model 1", "Test Model 2")) 
+```
+
+From RMSE distribution plot above, we can observe that the test model 2 has the lowest RMSE, followed by my model and test model 1. Therefore, test model 1 is potentially the best model among these three models, which need to be further analyzed.
 
 
 
