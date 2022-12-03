@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
 library(purrr)
+library(modelr)
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
@@ -194,6 +195,17 @@ summary(mult_fit_2)
 
 Next, I will show a plot of model residuals against fitted values.
 
+```{r, message=FALSE}
+birthweight_tidy %>%
+  add_residuals(mult_fit_2) %>%
+  add_predictions(mult_fit_2) %>%
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Plot of the Model Residuals Against Fitted Values",
+       x = "Fitted Values", y = "Residuals") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+```
 
 
 
