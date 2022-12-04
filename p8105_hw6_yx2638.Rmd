@@ -132,7 +132,7 @@ fit_summary %>%
   
 ```
 
-Homicides in which the victim is male are significantly less like to be resolved than those in which the victim is female.
+The estimate of the adjusted odds ratio for solving homicides is 0.426 comparing male victims to female victims keeping all other variables fixed and its confidence interval is (0.325, 0.558). We can conclude that homicides in which the victim is male are significantly less like to be resolved than those in which the victim is female in Baltimore.
 
 Fourth, run glm for each of the cities.
 
@@ -248,22 +248,30 @@ pairs(fit_var)
 
 From the plot above, we can observe that the a potential collinearity might exsit between `delwt` and `ppwt`, as well as `bhead` and `blength`. Therefore, I plan to drop `ppwt` and `blength` whose p-values are relatively larger.
 
-My final model is bwt ~  babysex + bhead + delwt + fincome + gaweeks + mheight + mrace + parity + smoken.
-
 ```{r}
-# my model
+# remedy for collinearity
 mult_fit_2 = lm(bwt ~  babysex + bhead + delwt + fincome + gaweeks + mheight + mrace + parity + smoken,
               data=birthweight_tidy)
 
 summary(mult_fit_2)
 ```
 
+From the summary, we find that `fincome` and `parity` have a p value of > 0.05, meaning that they are not significant. Therefore, I drop these two variables. My final model is bwt ~  babysex + bhead + delwt + gaweeks + mheight + mrace + smoken.
+
+```{r}
+# my final model
+mult_fit_3 = lm(bwt ~  babysex + bhead + delwt + gaweeks + mheight + mrace + smoken,
+              data=birthweight_tidy)
+
+summary(mult_fit_3)
+```
+
 Next, I will show a plot of model residuals against fitted values.
 
 ```{r, message=FALSE}
 birthweight_tidy %>%
-  add_residuals(mult_fit_2) %>%
-  add_predictions(mult_fit_2) %>%
+  add_residuals(mult_fit_3) %>%
+  add_predictions(mult_fit_3) %>%
   ggplot(aes(x = pred, y = resid)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE) +
@@ -286,6 +294,8 @@ fit_com_2 = lm(bwt ~ bhead + blength + babysex + bhead*blength + bhead*babysex +
 summary(fit_com_2)
 
 # cross-validation 
+set.seed(2022)
+
 cv_df = 
   crossv_mc(birthweight_tidy, 100) %>% 
     mutate(
@@ -293,7 +303,7 @@ cv_df =
         test = map(test,as_tibble)
     )  %>%
   mutate(
-    model_fit1  = map(train, ~lm(bwt ~ babysex + bhead + delwt + fincome + gaweeks + mheight + mrace + parity + smoken,
+    model_fit1  = map(train, ~lm(bwt ~ babysex + bhead + delwt + gaweeks + mheight + mrace + smoken,
                                  data = birthweight_tidy)),
     model_fit2  = map(train, ~lm(bwt ~ blength + gaweeks, data = birthweight_tidy)),
     model_fit3  = map(train, ~lm(bwt ~ blength + bhead + babysex + blength*bhead + blength* babysex + bhead*babysex + blength*bhead*babysex, data = birthweight_tidy))) %>% 
