@@ -175,7 +175,7 @@ city_gle %>%
         plot.title = element_text(size = 12))
 ```
 
-For `r city_gle %>% filter(term == "victim_sexMale") %>% filter(OR<1) %>% summarise(count=n()/47) %>% pull() %>% scales::percent(0.01)` of the cities, the estimate odds ratio for solving homicides for males comparing to females is less than one. In addition, for some of those cities (OR<1) such as New York and Baton Rouge, the odds ratio confidence interval does not include 1, which means the homicides in which the victim is male are significantly less likely to be resolved than those in which the victim is female. For those cities whose confidence interval includes 1, we cannot immediately conclude that there is a significant difference in solving homicides between male and female.
+For `r city_gle %>% filter(term == "victim_sexMale") %>% filter(OR<1) %>% summarise(count=n()/47) %>% pull() %>% scales::percent(0.01)` of the cities, the estimate odds ratio for solving homicides for males comparing to females is less than one. In addition, for some of those cities (OR<1) such as New York and Baton Rouge, the odds ratio confidence interval does not include 1, which means the homicides in which the victim is male are significantly less likely to be resolved than those in which the victim is female. For those cities whose confidence interval includes 1 (e.g., Stockton), we cannot immediately conclude that there is a significant difference in solving homicides between male and female.
 
 ### Problem 3 
 
@@ -214,6 +214,9 @@ sum(is.na(birthweight_tidy))
 # Data summary
 skimr::skim(birthweight_tidy)
 ```
+
+`babysex`, `malform`, `frace`, and `mrace` are converted into factors and recoded based on the given information. In addition, no missing values exist in the tidy dataset.
+
 
 ### Propose a Regression Model for Birthweight
 
