@@ -132,7 +132,7 @@ fit_summary %>%
   
 ```
 
-The estimate of the adjusted odds ratio for solving homicides is 0.426 comparing male victims to female victims keeping all other variables fixed and its confidence interval is (0.325, 0.558). We can conclude that homicides in which the victim is male are significantly less like to be resolved than those in which the victim is female in Baltimore.
+The estimate of the adjusted odds ratio for solving homicides is 0.426 comparing male victims to female victims keeping all other variables fixed and its confidence interval is (0.325, 0.558). Homicides in which the victim is male are significantly less like to be resolved than those in which the victim is female in Baltimore.
 
 Fourth, run glm for each of the cities.
 
